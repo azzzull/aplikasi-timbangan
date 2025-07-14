@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timbangan Apps</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <main>
+            <h1>Timbangan</h1>
+            <div id="dataContainer">
+                <p>Klik tombol untuk menampilkan data</p>
+            </div>
+            <div class="button-group">
+                <button id="fetchButton">Ambil Data Timbangan</button>
+                <button id="saveButton" class="button" disabled>Simpan Data Timbangan</button>
+                <button id="viewDataButton" class="button">Lihat Data Tersimpan</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Popup -->
+    <div id="saveModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Simpan Data Timbangan</h2>
+            <form id="saveForm">
+                <div class="form-group">
+                    <label for="itemCode">Kode Barang</label>
+                    <input type="text" id="itemCode" required>
+                </div>
+                <div class="form-group">
+                    <label for="itemName">Nama Barang</label>
+                    <input type="text" id="itemName" required>
+                </div>
+                <button type="submit" class="submit-button">Simpan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal untuk Lihat Data -->
+    <div id="viewDataModal" class="modal">
+        <div class="modal-content view-modal-content">
+            <span class="close-view-button">&times;</span>
+            <h2>Data Timbangan Tersimpan</h2>
+            <div id="dataListContainer">
+                <p>Memuat data...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
