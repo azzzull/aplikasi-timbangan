@@ -132,12 +132,13 @@ h1 {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0,0,0,0.7);
+    backdrop-filter: blur(2px);
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto;
+    margin: 10% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
@@ -227,12 +228,23 @@ h1 {
     box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     border-radius: 8px;
     overflow: hidden;
+    table-layout: fixed; /* Fixed layout untuk konsistensi */
 }
 
 .data-table th, .data-table td {
     border: 1px solid #e0e0e0;
     padding: 8px 6px;
+    word-wrap: break-word;
+    overflow: visible;
+    vertical-align: top;
 }
+
+/* Fixed width untuk setiap kolom */
+.data-table th:nth-child(1), .data-table td:nth-child(1) { width: 18%; } /* Kode */
+.data-table th:nth-child(2), .data-table td:nth-child(2) { width: 25%; } /* Nama */
+.data-table th:nth-child(3), .data-table td:nth-child(3) { width: 15%; } /* Berat */
+.data-table th:nth-child(4), .data-table td:nth-child(4) { width: 17%; } /* Lokasi */
+.data-table th:nth-child(5), .data-table td:nth-child(5) { width: 25%; } /* Waktu */
 
 .data-table th {
     background: #f5f5f5;
@@ -247,6 +259,49 @@ h1 {
 
 .data-table td {
     text-align: center;
+    color: #333;
+}
+
+/* Pagination Styles */
+.pagination-info {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 10px;
+}
+
+.pagination-controls button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+    background-color: rgb(60, 130, 200);
+}
+
+.pagination-controls button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.pagination-controls span {
+    font-weight: 500;
     color: #333;
 }
 
@@ -281,15 +336,40 @@ h1 {
     .modal-content {
         width: 85%;
         padding: 20px;
-        margin: 50% auto;
+        margin: 30% auto;
     }
 
     .data-table th, .data-table td {
         font-size: 0.92rem;
         padding: 6px 2px;
+        word-wrap: break-word;
+        overflow: visible;
+        vertical-align: top;
     }
     
     .data-table {
         font-size: 0.92rem;
+        table-layout: fixed;
+    }
+
+    /* Mobile column widths - lebih spesifik */
+    .data-table th:nth-child(1), .data-table td:nth-child(1) { width: 15%; font-size: 0.8rem; } /* Kode */
+    .data-table th:nth-child(2), .data-table td:nth-child(2) { width: 25%; font-size: 0.8rem; } /* Nama */
+    .data-table th:nth-child(3), .data-table td:nth-child(3) { width: 15%; font-size: 0.8rem; } /* Berat */
+    .data-table th:nth-child(4), .data-table td:nth-child(4) { width: 15%; font-size: 0.8rem; } /* Lokasi */
+    .data-table th:nth-child(5), .data-table td:nth-child(5) { width: 30%; font-size: 0.8rem; } /* Waktu */
+
+    .pagination-controls {
+        gap: 10px;
+        font-size: 0.8rem;
+    }
+
+    .pagination-controls button {
+        padding: 10px 20px;
+        font-size: 0.8rem;
+    }
+
+    .pagination-info {
+        font-size: 0.8rem;
     }
 }

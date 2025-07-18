@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let scaleData = null;
+    let currentPage = 1;
+    let totalPages = 1;
 
     // Generate random weight data
     function generateWeightData() {
@@ -81,8 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) throw new Error('Network error');
-
-            alert('Data tersimpan!');
             elements.modal.style.display = 'none';
             elements.saveForm.reset();
             elements.saveButton.disabled = true;
@@ -92,36 +92,66 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // View data - simplified
-    elements.viewDataButton.addEventListener('click', async () => {
-        elements.viewDataModal.style.display = 'block';
-        elements.dataListContainer.innerHTML = '<p>Loading...</p>';
-        
+    // View data with pagination
+    async function loadData(page = 1) {
         try {
-            const response = await fetch('/api/weights');
+            // Use smaller limit for mobile to reduce scroll
+            const isMobile = window.innerWidth <= 600;
+            const limit = isMobile ? 10 : 10;
+            
+            const response = await fetch(`/api/weights?page=${page}&limit=${limit}`);
             if (!response.ok) throw new Error('Failed to fetch');
             
-            const data = await response.json();
-            if (data.length === 0) {
-                elements.dataListContainer.innerHTML = '<p>No data.</p>';
+            const result = await response.json();
+            currentPage = result.pagination.currentPage;
+            totalPages = result.pagination.totalPages;
+            
+            if (result.data.length === 0) {
+                elements.dataListContainer.innerHTML = '<p>No data available.</p>';
             } else {
-                const tableHTML = `<table class="data-table">
-                    <thead><tr><th>Kode</th><th>Nama</th><th>Berat</th><th>Lokasi</th><th>Waktu</th></tr></thead>
-                    <tbody>
-                        ${data.map(item => `<tr>
-                            <td>${item.itemCode}</td>
-                            <td>${item.itemName}</td>
-                            <td>${item.weight}</td>
-                            <td>${item.location}</td>
-                            <td>${item.datetime}</td>
-                        </tr>`).join('')}
-                    </tbody>
-                </table>`;
+                const tableHTML = `
+                    <table class="data-table">
+                        <thead><tr><th>Kode</th><th>Nama</th><th>Berat</th><th>Lokasi</th><th>Waktu</th></tr></thead>
+                        <tbody>
+                            ${result.data.map(item => `<tr>
+                                <td>${item.itemCode}</td>
+                                <td>${item.itemName}</td>
+                                <td>${item.weight} Kg</td>
+                                <td>${item.location}</td>
+                                <td>${item.datetime}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                    <div class="pagination-controls">
+                        <button onclick="previousPage()" ${!result.pagination.hasPreviousPage ? 'disabled' : ''}>←</button>
+                        <span>${currentPage} / ${totalPages}</span>
+                        <button onclick="nextPage()" ${!result.pagination.hasNextPage ? 'disabled' : ''}>→</button>
+                    </div>
+                `;
                 elements.dataListContainer.innerHTML = tableHTML;
             }
         } catch (err) {
             elements.dataListContainer.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
         }
+    }
+
+    // Pagination functions
+    window.previousPage = () => {
+        if (currentPage > 1) {
+            loadData(currentPage - 1);
+        }
+    };
+
+    window.nextPage = () => {
+        if (currentPage < totalPages) {
+            loadData(currentPage + 1);
+        }
+    };
+
+    elements.viewDataButton.addEventListener('click', async () => {
+        elements.viewDataModal.style.display = 'block';
+        elements.dataListContainer.innerHTML = '<p>Loading...</p>';
+        loadData(1);
     });
 
     elements.closeViewButton.addEventListener('click', () => {

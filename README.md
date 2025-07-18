@@ -1,11 +1,11 @@
-# IoT Weighing Scale Application
+# Aplikasi Timbangan
 
 Lightweight weighing scale application optimized for IoT devices with limited memory and resources.
 
 ## ⚡ Optimizations for IoT
 
 - **Minimal Dependencies**: Only Express.js and SQLite3
-- **Memory Efficient**: Auto-cleanup after 100 records
+- **Memory Efficient**: Auto-cleanup after 1000 records
 - **Lightweight Frontend**: Compressed CSS/JS 
 - **Small Database**: Simple schema without unnecessary fields
 - **Low Resource Usage**: Optimized for embedded systems

@@ -14,8 +14,16 @@ const db = new Database(dbPath);
 // Routes
 app.get('/api/weights', async (req, res) => {
     try {
-        const weights = await db.getAllWeights();
-        res.json(weights);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        
+        // Validate pagination parameters
+        if (page < 1 || limit < 1 || limit > 100) {
+            return res.status(400).json({ error: 'Invalid pagination parameters' });
+        }
+        
+        const result = await db.getAllWeights(page, limit);
+        res.json(result);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

@@ -55,7 +55,7 @@ class Database {
                 this.db.run(`
                     CREATE TRIGGER IF NOT EXISTS limit_records 
                     AFTER INSERT ON weights 
-                    WHEN (SELECT COUNT(*) FROM weights) > 100 
+                    WHEN (SELECT COUNT(*) FROM weights) > 1000 
                     BEGIN 
                         DELETE FROM weights WHERE id = (SELECT MIN(id) FROM weights);
                     END
@@ -63,7 +63,7 @@ class Database {
                     if (triggerErr) {
                         console.log('Note: Could not create limit trigger (optional optimization)');
                     } else {
-                        console.log('Auto-cleanup trigger enabled (max 100 records)');
+                        console.log('Auto-cleanup trigger enabled (max 1000 records)');
                     }
                 });
             }
@@ -92,17 +92,41 @@ class Database {
         });
     }
 
-    // Ambil data terbatas untuk IoT device
-    getAllWeights(limit = 50) {
+    // Ambil data dengan pagination untuk IoT device
+    getAllWeights(page = 1, limit = 20) {
         return new Promise((resolve, reject) => {
-            const sql = 'SELECT * FROM weights ORDER BY id DESC LIMIT ?';
+            const offset = (page - 1) * limit;
             
-            this.db.all(sql, [limit], (err, rows) => {
+            // Get total count
+            this.db.get('SELECT COUNT(*) as total FROM weights', (err, countResult) => {
                 if (err) {
                     reject(err);
-                } else {
-                    resolve(rows);
+                    return;
                 }
+                
+                const totalRecords = countResult.total;
+                const totalPages = Math.ceil(totalRecords / limit);
+                
+                // Get paginated data
+                const sql = 'SELECT * FROM weights ORDER BY id DESC LIMIT ? OFFSET ?';
+                
+                this.db.all(sql, [limit, offset], (err, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve({
+                            data: rows,
+                            pagination: {
+                                currentPage: page,
+                                totalPages: totalPages,
+                                totalRecords: totalRecords,
+                                hasNextPage: page < totalPages,
+                                hasPreviousPage: page > 1,
+                                limit: limit
+                            }
+                        });
+                    }
+                });
             });
         });
     }
