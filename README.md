@@ -6,6 +6,7 @@ Lightweight weighing scale application optimized for IoT devices with limited me
 
 - **Minimal Dependencies**: Only Express.js and SQLite3
 - **Memory Efficient**: Auto-cleanup after 1000 records
+- **Pagination Support**: 20 items per page (10 for mobile)
 - **Lightweight Frontend**: Compressed CSS/JS 
 - **Small Database**: Simple schema without unnecessary fields
 - **Low Resource Usage**: Optimized for embedded systems
@@ -14,9 +15,11 @@ Lightweight weighing scale application optimized for IoT devices with limited me
 
 - ✅ Generate random weight data simulation
 - ✅ Save data to SQLite database  
-- ✅ View saved data in responsive table
-- ✅ Auto-cleanup old records (keeps last 100)
-- ✅ Mobile-friendly UI
+- ✅ View saved data in responsive table with pagination
+- ✅ Auto-cleanup old records (keeps last 1000)
+- ✅ Mobile-friendly UI with optimized modal
+- ✅ Pagination controls (20 items per page, 10 for mobile)
+- ✅ Fixed table layout for consistent display
 - ✅ In-memory database option for testing
 
 ## 🛠️ Tech Stack
@@ -77,8 +80,8 @@ NODE_ENV=production
 
 ## 💾 Memory Usage
 
-- **Runtime Memory**: ~15-20 MB
-- **Database Size**: ~1-5 KB (100 records)
+- **Runtime Memory**: ~30-50 MB
+- **Database Size**: ~10-50 KB (1000 records max)
 - **Application Size**: ~2 MB total
 - **Dependencies**: Only 2 packages (express, sqlite3)
 
@@ -96,15 +99,31 @@ iot-timbangan/
 
 ## 🌐 API Endpoints
 
-- `GET /api/weights` - Get last 50 weight records
+- `GET /api/weights?page=1&limit=20` - Get paginated weight records
 - `POST /api/weights` - Save new weight data
+
+**Pagination Response:**
+```json
+{
+  "data": [...],
+  "pagination": {
+    "currentPage": 1,
+    "totalPages": 5,
+    "totalRecords": 87,
+    "hasNextPage": true,
+    "hasPreviousPage": false,
+    "limit": 20
+  }
+}
+```
 
 ## 📱 Usage
 
 1. Click "Ambil Data Timbangan" to simulate weight reading
 2. Click "Simpan Data Timbangan" to save to database  
-3. Click "Lihat Data Tersimpan" to view all saved data
-4. Data automatically cleaned up after 100 records
+3. Click "Lihat Data Tersimpan" to view paginated data
+4. Use Previous/Next buttons to navigate between pages
+5. Data automatically cleaned up after 1000 records
 
 ## 🔋 IoT Device Compatibility
 
