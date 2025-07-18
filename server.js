@@ -1,21 +1,15 @@
 const express = require('express');
-const cors = require('cors');
 const path = require('path');
 const Database = require('./database');
-require('dotenv').config();
 
+// Minimal config untuk IoT
 const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// SQLite Database Connection
-const dbPath = process.env.DATABASE_PATH || './database/timbangan.db';
-const db = new Database(dbPath);
-
-// Serve static files
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
+
+// Database - bisa switch ke in-memory untuk testing
+const dbPath = process.env.NODE_ENV === 'development' ? ':memory:' : './database/timbangan.db';
+const db = new Database(dbPath);
 
 // Routes
 app.get('/api/weights', async (req, res) => {
