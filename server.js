@@ -1,6 +1,7 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
+const Database = require('./database');
 require('dotenv').config();
 
 const app = express();
@@ -9,48 +10,26 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// MongoDB Connection
-const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/balanced-app';
-async function connectDB() {
-    try {
-        await mongoose.connect(mongoUri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
-        console.log('MongoDB database connection established successfully');
-    } catch (err) {
-        console.error('MongoDB connection error:', err.message);
-        process.exit(1);
-    }
-}
-connectDB();
+// SQLite Database Connection
+const dbPath = process.env.DATABASE_PATH || './database/timbangan.db';
+const db = new Database(dbPath);
 
-// Model
-const weightSchema = new mongoose.Schema({
-    scaleId: String,
-    itemCode: String,
-    itemName: String,
-    weight: Number,
-    location: String,
-    date: String,
-    time: String
-});
-const Weight = mongoose.model('Weight', weightSchema);
+// Serve static files
+app.use(express.static(__dirname));
 
 // Routes
 app.get('/api/weights', async (req, res) => {
     try {
-        const weights = await Weight.find();
+        const weights = await db.getAllWeights();
         res.json(weights);
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
 });
 
 app.post('/api/weights', async (req, res) => {
     try {
-        const newWeight = new Weight(req.body);
-        const savedWeight = await newWeight.save();
+        const savedWeight = await db.saveWeight(req.body);
         res.json(savedWeight);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -60,13 +39,14 @@ app.post('/api/weights', async (req, res) => {
 // Delete data timbangan berdasarkan scaleId
 app.delete('/api/weights/:scaleId', async (req, res) => {
     try {
-        const result = await Weight.findOneAndDelete({ scaleId: req.params.scaleId });
-        if (!result) {
-            return res.status(404).json({ error: 'Data tidak ditemukan' });
-        }
-        res.json({ message: 'Data berhasil dihapus' });
+        const result = await db.deleteWeight(req.params.scaleId);
+        res.json(result);
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        if (err.message === 'Data tidak ditemukan') {
+            res.status(404).json({ error: err.message });
+        } else {
+            res.status(500).json({ error: err.message });
+        }
     }
 });
 
@@ -77,23 +57,20 @@ app.patch('/api/weights/:scaleId', async (req, res) => {
         if (!itemName) {
             return res.status(400).json({ error: 'Nama barang tidak boleh kosong' });
         }
-        const updatedWeight = await Weight.findOneAndUpdate(
-            { scaleId: req.params.scaleId }, 
-            { itemName }, 
-            { new: true }
-        );
-        if (!updatedWeight) {
-            return res.status(404).json({ error: 'Data tidak ditemukan' });
-        }
+        const updatedWeight = await db.updateItemName(req.params.scaleId, itemName);
         res.json(updatedWeight);
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        if (err.message === 'Data tidak ditemukan') {
+            res.status(404).json({ error: err.message });
+        } else {
+            res.status(500).json({ error: err.message });
+        }
     }
 });
 
 // Basic route untuk testing
 app.get('/', (req, res) => {
-    res.json({ message: 'Welcome to Balanced App API' });
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Error handling middleware

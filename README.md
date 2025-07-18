@@ -22,7 +22,7 @@ Aplikasi web untuk mengelola data timbangan dengan frontend HTML/CSS/JavaScript 
 **Backend:**
 - Node.js
 - Express.js
-- MongoDB dengan Mongoose
+- SQLite dengan sqlite3
 - CORS untuk API
 
 ## Instalasi
@@ -40,18 +40,18 @@ npm install
 
 3. Buat file `.env` di root folder:
 ```env
-MONGODB_URI=mongodb://localhost:27017/timbangan
+DATABASE_PATH=./database/timbangan.db
 PORT=5050
 ```
 
-4. Pastikan MongoDB sudah berjalan di sistem Anda
-
-5. Jalankan server:
+4. Jalankan server:
 ```bash
 npm start
 ```
 
-6. Buka browser dan akses: `http://localhost:5050`
+Database SQLite akan otomatis dibuat saat pertama kali menjalankan server.
+
+5. Buka browser dan akses: `http://localhost:5050`
 
 ## Struktur Project
 
@@ -61,7 +61,9 @@ Balanced-App/
 ├── index.html          # Halaman utama
 ├── style.css           # Styling
 ├── server.js           # Backend API server
+├── database.js         # SQLite database helper
 ├── package.json        # Dependencies
+├── database/           # SQLite database files (auto-generated)
 ├── .env               # Environment variables (jangan di-commit)
 ├── .gitignore         # File yang diabaikan Git
 └── README.md          # Dokumentasi

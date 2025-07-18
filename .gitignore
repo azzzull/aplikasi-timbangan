@@ -11,6 +11,12 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Database files
+database/
+*.db
+*.sqlite
+*.sqlite3
+
 # Logs
 logs
 *.log
