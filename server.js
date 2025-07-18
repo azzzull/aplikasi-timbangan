@@ -36,38 +36,6 @@ app.post('/api/weights', async (req, res) => {
     }
 });
 
-// Delete data timbangan berdasarkan scaleId
-app.delete('/api/weights/:scaleId', async (req, res) => {
-    try {
-        const result = await db.deleteWeight(req.params.scaleId);
-        res.json(result);
-    } catch (err) {
-        if (err.message === 'Data tidak ditemukan') {
-            res.status(404).json({ error: err.message });
-        } else {
-            res.status(500).json({ error: err.message });
-        }
-    }
-});
-
-// Update nama barang berdasarkan scaleId
-app.patch('/api/weights/:scaleId', async (req, res) => {
-    try {
-        const { itemName } = req.body;
-        if (!itemName) {
-            return res.status(400).json({ error: 'Nama barang tidak boleh kosong' });
-        }
-        const updatedWeight = await db.updateItemName(req.params.scaleId, itemName);
-        res.json(updatedWeight);
-    } catch (err) {
-        if (err.message === 'Data tidak ditemukan') {
-            res.status(404).json({ error: err.message });
-        } else {
-            res.status(500).json({ error: err.message });
-        }
-    }
-});
-
 // Basic route untuk testing
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));

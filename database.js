@@ -29,8 +29,7 @@ class Database {
                 itemName TEXT NOT NULL,
                 weight REAL NOT NULL,
                 location TEXT NOT NULL,
-                date TEXT NOT NULL,
-                time TEXT NOT NULL,
+                datetime TEXT NOT NULL,
                 createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         `;
@@ -48,8 +47,8 @@ class Database {
     saveWeight(data) {
         return new Promise((resolve, reject) => {
             const sql = `
-                INSERT INTO weights (scaleId, itemCode, itemName, weight, location, date, time)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO weights (scaleId, itemCode, itemName, weight, location, datetime)
+                VALUES (?, ?, ?, ?, ?, ?)
             `;
             
             this.db.run(sql, [
@@ -58,8 +57,7 @@ class Database {
                 data.itemName,
                 data.weight,
                 data.location,
-                data.date,
-                data.time
+                data.datetime
             ], function(err) {
                 if (err) {
                     reject(err);
@@ -83,48 +81,6 @@ class Database {
                     reject(err);
                 } else {
                     resolve(rows);
-                }
-            });
-        });
-    }
-
-    // Update nama barang berdasarkan scaleId
-    updateItemName(scaleId, newItemName) {
-        return new Promise((resolve, reject) => {
-            const sql = 'UPDATE weights SET itemName = ? WHERE scaleId = ?';
-            
-            this.db.run(sql, [newItemName, scaleId], function(err) {
-                if (err) {
-                    reject(err);
-                } else if (this.changes === 0) {
-                    reject(new Error('Data tidak ditemukan'));
-                } else {
-                    // Ambil data yang sudah diupdate
-                    const selectSQL = 'SELECT * FROM weights WHERE scaleId = ?';
-                    this.db.get(selectSQL, [scaleId], (err, row) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(row);
-                        }
-                    });
-                }
-            });
-        });
-    }
-
-    // Hapus data berdasarkan scaleId
-    deleteWeight(scaleId) {
-        return new Promise((resolve, reject) => {
-            const sql = 'DELETE FROM weights WHERE scaleId = ?';
-            
-            this.db.run(sql, [scaleId], function(err) {
-                if (err) {
-                    reject(err);
-                } else if (this.changes === 0) {
-                    reject(new Error('Data tidak ditemukan'));
-                } else {
-                    resolve({ message: 'Data berhasil dihapus', deletedCount: this.changes });
                 }
             });
         });
